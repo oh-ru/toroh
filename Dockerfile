@@ -1,4 +1,4 @@
-FROM openhab/openhab:5.2.0-debian
+FROM openhab/openhab:5.2.0-snapshot-debian
 
 USER root
 

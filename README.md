@@ -6,7 +6,7 @@ Docker-образ OpenHAB со встроенным Tor и поддержкой 
 
 ## Как это работает
 
-Образ основан на `openhab/openhab:5.2.0-debian`, в который добавлены `tor` и `obfs4proxy`.
+Образ основан на `openhab/openhab:5.2.0-snapshot-debian`, в который добавлены `tor` и `obfs4proxy`.
 
 При старте контейнера:
 
@@ -128,7 +128,7 @@ Designed for users whose ISP blocks access to `*.openhab.org`, `*.eclipse.org`, 
 
 ## How it works
 
-The image is based on `openhab/openhab:5.2.0-debian` with `tor` and `obfs4proxy` added on top.
+The image is based on `openhab/openhab:5.2.0-snapshot-debian` with `tor` and `obfs4proxy` added on top.
 
 On container start:
 
