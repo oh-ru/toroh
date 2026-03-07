@@ -34,11 +34,8 @@ jobs:
         with:
           ref: ${{ matrix.branch }}
 
-      - name: Fetch bridges.txt from default branch
-        run: |
-          git fetch origin ${{ github.event.repository.default_branch }}
-          git checkout origin/${{ github.event.repository.default_branch }} -- .github/bridges.txt
-          cp .github/bridges.txt bridges.txt
+      - name: Copy bridges.txt
+        run: cp .github/bridges.txt bridges.txt
 
       - name: Log in to ghcr.io
         uses: docker/login-action@v3
