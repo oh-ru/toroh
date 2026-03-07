@@ -6,7 +6,7 @@ Docker-образ OpenHAB со встроенным Tor и поддержкой 
 
 ## Как это работает
 
-Образ основан на `openhab/openhab:5.1.2-debian`, в который добавлены `tor` и `obfs4proxy`.
+Образ основан на `openhab/openhab:5.2.0-debian`, в который добавлены `tor` и `obfs4proxy`.
 
 При старте контейнера:
 
@@ -32,7 +32,7 @@ Docker-образ OpenHAB со встроенным Tor и поддержкой 
 ```yaml
 services:
   openhab:
-    image: ghcr.io/oh-ru/toroh:5.1.2
+    image: ghcr.io/oh-ru/toroh:5.2.0
     container_name: openhab
     restart: unless-stopped
     network_mode: host
@@ -57,7 +57,7 @@ docker run -d \
   -v ./conf:/openhab/conf \
   -v ./userdata:/openhab/userdata \
   -v ./addons:/openhab/addons \
-  ghcr.io/oh-ru/toroh:5.1.2
+  ghcr.io/oh-ru/toroh:5.2.0
 ```
 
 ### С собственными мостами
@@ -113,10 +113,10 @@ TOR_BRIDGES=obfs4 1.2.3.4:1234 FP1 cert=AAA iat-mode=0,obfs4 5.6.7.8:5678 FP2 ce
 
 | Тег | Описание |
 |---|---|
-| `5.1.2` | Актуальная сборка ветки `v5.1.2` |
+| `5.2.0` | Актуальная сборка ветки `v5.2.0` |
 | `sha-<hash>` | Сборка конкретного коммита |
 
-Образы публикуются в `ghcr.io/oh-ru/toroh` через GitHub Actions при каждом пуше в ветку `v5.1.2`, а также ежедневно по расписанию.
+Образы публикуются в `ghcr.io/oh-ru/toroh` через GitHub Actions при каждом пуше в ветку `v5.2.0`, а также ежедневно по расписанию.
 
 ---
 
@@ -128,7 +128,7 @@ Designed for users whose ISP blocks access to `*.openhab.org`, `*.eclipse.org`, 
 
 ## How it works
 
-The image is based on `openhab/openhab:5.1.2-debian` with `tor` and `obfs4proxy` added on top.
+The image is based on `openhab/openhab:5.2.0-debian` with `tor` and `obfs4proxy` added on top.
 
 On container start:
 
@@ -154,7 +154,7 @@ If you pass your own parameters via `EXTRA_JAVA_OPTS`, they are appended to thes
 ```yaml
 services:
   openhab:
-    image: ghcr.io/oh-ru/toroh:5.1.2
+    image: ghcr.io/oh-ru/toroh:5.2.0
     container_name: openhab
     restart: unless-stopped
     network_mode: host
@@ -179,7 +179,7 @@ docker run -d \
   -v ./conf:/openhab/conf \
   -v ./userdata:/openhab/userdata \
   -v ./addons:/openhab/addons \
-  ghcr.io/oh-ru/toroh:5.1.2
+  ghcr.io/oh-ru/toroh:5.2.0
 ```
 
 ### With custom bridges
@@ -235,7 +235,7 @@ TOR_BRIDGES=obfs4 1.2.3.4:1234 FP1 cert=AAA iat-mode=0,obfs4 5.6.7.8:5678 FP2 ce
 
 | Tag | Description |
 |---|---|
-| `5.1.2` | Latest build from `v5.1.2` branch |
+| `5.2.0` | Latest build from `v5.2.0` branch |
 | `sha-<hash>` | Specific commit build |
 
-Images are published to `ghcr.io/oh-ru/toroh` via GitHub Actions on every push to the `v5.1.2` branch and daily on schedule.
+Images are published to `ghcr.io/oh-ru/toroh` via GitHub Actions on every push to the `v5.2.0` branch and daily on schedule.

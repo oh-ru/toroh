@@ -3,7 +3,7 @@ name: Build and push to ghcr.io
 on:
   push:
     branches:
-      - v5.1.2
+      # - v5.1.2
       - v5.2.0
   schedule:
     - cron: '0 3 * * *'
@@ -27,8 +27,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - branch: v5.1.2
-            tag: 5.1.2
+          # - branch: v5.1.2
+          #   tag: 5.1.2
           - branch: v5.2.0
             tag: 5.2.0
 
