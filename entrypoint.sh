@@ -15,7 +15,7 @@ su-exec "$USER_ID:$GROUP_ID" /tor-start.sh > >(tee /tmp/tor.log) 2>&1 &
 TOR_PID=$!
 
 echo "[toroh] Waiting for Tor bootstrap..."
-timeout=300
+timeout=600
 elapsed=0
 while true; do
     if grep -q "Bootstrapped 100%" /tmp/tor.log 2>/dev/null; then

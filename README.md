@@ -11,7 +11,7 @@ Docker-образ OpenHAB со встроенным Tor и поддержкой 
 При старте контейнера:
 
 1. Tor запускается в фоне, используя мосты из переменной окружения `TOR_BRIDGES` или из встроенного файла `/etc/tor/bridges.txt`
-2. Entrypoint ждёт, пока Tor сообщит `Bootstrapped 100%` (до 5 минут)
+2. Entrypoint ждёт, пока Tor сообщит `Bootstrapped 100%` (до 10 минут)
 3. Только после успешного bootstrap запускается OpenHAB — это гарантирует, что все сетевые запросы идут через Tor с первой же секунды
 
 Трафик JVM OpenHAB автоматически направляется через локальный SOCKS5-прокси (`127.0.0.1:9050`). Параметры прокси добавляются автоматически в `EXTRA_JAVA_OPTS`:
@@ -133,7 +133,7 @@ The image is based on `openhab/openhab:5.1.2-debian` with `tor` and `obfs4proxy`
 On container start:
 
 1. Tor starts in the background using bridges from the `TOR_BRIDGES` environment variable or from the built-in `/etc/tor/bridges.txt`
-2. The entrypoint waits until Tor reports `Bootstrapped 100%` (up to 5 minutes)
+2. The entrypoint waits until Tor reports `Bootstrapped 100%` (up to 10 minutes)
 3. Only after successful bootstrap does OpenHAB start — guaranteeing that all network requests go through Tor from the very first second
 
 OpenHAB JVM traffic is automatically routed through the local SOCKS5 proxy (`127.0.0.1:9050`). The proxy parameters are added automatically to `EXTRA_JAVA_OPTS`:
