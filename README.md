@@ -132,13 +132,24 @@ The image is based on `openhab/openhab:5.1.2-debian` with `tor` and `obfs4proxy`
 
 On container start:
 
-1. Tor starts in the background using bridges from the `TOR_BRIDGES` environment variable
+1. Tor starts in the background using bridges from the `TOR_BRIDGES` environment variable or from the built-in `/etc/tor/bridges.txt`
 2. The entrypoint waits until Tor reports `Bootstrapped 100%` (up to 5 minutes)
 3. Only after successful bootstrap does OpenHAB start — guaranteeing that all network requests go through Tor from the very first second
 
-OpenHAB is configured to route all JVM traffic through the local SOCKS5 proxy (`127.0.0.1:9050`) via `EXTRA_JAVA_OPTS`.
+OpenHAB JVM traffic is automatically routed through the local SOCKS5 proxy (`127.0.0.1:9050`). The proxy parameters are added automatically to `EXTRA_JAVA_OPTS`:
+
+```
+-DsocksProxyHost=127.0.0.1
+-DsocksProxyPort=9050
+-DsocksProxyVersion=5
+-Dhttp.nonProxyHosts=localhost|127.0.0.1|10.*|172.*|192.168.*
+```
+
+If you pass your own parameters via `EXTRA_JAVA_OPTS`, they are appended to these defaults.
 
 ## Usage
+
+### Minimal setup (with built-in bridges)
 
 ```yaml
 services:
@@ -148,8 +159,6 @@ services:
     restart: unless-stopped
     network_mode: host
     environment:
-      - TOR_BRIDGES=obfs4 1.2.3.4:1234 FINGERPRINT cert=... iat-mode=0,obfs4 5.6.7.8:5678 FINGERPRINT cert=... iat-mode=0
-      - EXTRA_JAVA_OPTS=-Duser.timezone=Europe/Moscow -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=9050 -DsocksProxyVersion=5 -Dhttp.nonProxyHosts=localhost|127.0.0.1|192.168.*
       - USER_ID=1001
       - GROUP_ID=1001
     volumes:
@@ -165,8 +174,6 @@ docker run -d \
   --name openhab \
   --restart unless-stopped \
   --network host \
-  -e TOR_BRIDGES="obfs4 1.2.3.4:1234 FINGERPRINT cert=... iat-mode=0" \
-  -e EXTRA_JAVA_OPTS="-Duser.timezone=Europe/Moscow -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=9050 -DsocksProxyVersion=5 -Dhttp.nonProxyHosts=localhost|127.0.0.1|192.168.*" \
   -e USER_ID=1001 \
   -e GROUP_ID=1001 \
   -v ./conf:/openhab/conf \
@@ -175,14 +182,37 @@ docker run -d \
   ghcr.io/oh-ru/toroh:5.1.2
 ```
 
+### With custom bridges
+
+Via environment variable (comma-separated):
+
+```yaml
+environment:
+  - TOR_BRIDGES=obfs4 1.2.3.4:1234 FINGERPRINT cert=... iat-mode=0,obfs4 5.6.7.8:5678 FINGERPRINT cert=... iat-mode=0
+```
+
+Or by mounting a bridges file:
+
+```yaml
+volumes:
+  - ./bridges.txt:/etc/tor/bridges.txt:ro
+```
+
+File format — one bridge per line:
+
+```
+obfs4 1.2.3.4:1234 FINGERPRINT cert=... iat-mode=0
+obfs4 5.6.7.8:5678 FINGERPRINT cert=... iat-mode=0
+```
+
 Full base image documentation: [hub.docker.com/r/openhab/openhab](https://hub.docker.com/r/openhab/openhab)
 
 ## Environment variables
 
 | Variable | Required | Description |
 |---|---|---|
-| `TOR_BRIDGES` | No | Comma-separated list of obfs4 bridges. If not set, Tor connects directly without bridges. |
-| `EXTRA_JAVA_OPTS` | No | JVM options passed to OpenHAB. Set `socksProxyHost`/`socksProxyPort` here to route traffic through Tor. |
+| `TOR_BRIDGES` | No | Comma-separated list of obfs4 bridges. If not set, built-in bridges from `/etc/tor/bridges.txt` are used. |
+| `EXTRA_JAVA_OPTS` | No | Additional JVM options for OpenHAB. Appended to the automatic SOCKS parameters. Example: `-Duser.timezone=Europe/London`. |
 | `USER_ID` | No | UID for the openhab process (default: 9001) |
 | `GROUP_ID` | No | GID for the openhab process (default: USER_ID) |
 
@@ -190,7 +220,10 @@ All other environment variables from the base `openhab/openhab` image are suppor
 
 ## Getting obfs4 bridges
 
-Bridges can be obtained from [bridges.torproject.org](https://bridges.torproject.org/bridges?transport=obfs4) — select **obfs4** type.
+The image includes built-in bridges that are updated on every build. If they don't work, get fresh bridges:
+
+- From [bridges.torproject.org](https://bridges.torproject.org/bridges?transport=obfs4) — select **obfs4** type
+- Via Telegram bot [@GetBridgesBot](https://t.me/GetBridgesBot)
 
 Multiple bridges are separated by a comma in `TOR_BRIDGES`:
 
