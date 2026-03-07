@@ -1,0 +1,80 @@
+name: Build and push to ghcr.io
+
+on:
+  push:
+    branches:
+      - v5.1.2
+      - v5.2.0
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    strategy:
+      matrix:
+        include:
+          - branch: v5.1.2
+            tag: 5.1.2
+          - branch: v5.2.0
+            tag: 5.2.0
+
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+
+      - name: Fetch bridges.txt from default branch
+        run: |
+          git fetch origin ${{ github.event.repository.default_branch }}
+          git checkout origin/${{ github.event.repository.default_branch }} -- .github/bridges.txt
+          cp .github/bridges.txt bridges.txt
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ matrix.tag }}
+            type=sha,prefix=sha-,format=short
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Keep cron alive
+        if: github.event_name == 'schedule' && matrix.branch == github.event.repository.default_branch
+        run: |
+          echo "Last scheduled build: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" > .github/last-build.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/last-build.txt
+          git commit -m "chore: update last build timestamp [skip ci]"
+          git push origin ${{ matrix.branch }}
